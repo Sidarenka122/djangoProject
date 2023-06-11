@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block main %}
+    {% if message %}
+        <div class="alert alert-success" role="alert">
+            <strong>{{ message }}</strong>
+        </div>
+    {% endif %}
+    <hr />
+    <p>
+        Welcome to our auction site for houses!
+        Here, you will find a wide range of properties available for bidding, from cozy starter homes to luxurious estates.
+        Whether you are a first-time homebuyer or an experienced investor, our site provides a user-friendly interface and comprehensive information to help you make informed decisions.
+        So, start browsing and bidding today, and let us help you find your dream home!
+    </p>
+    <hr />
+    <h4>Available Property</h4>
+    {% if available_announcements %}
+        {% for announcement in available_announcements %}
+            <div class="card mt-4">
+                {% if announcement.house.photo_set.first %}
+                    <img class="card-img-top" src="/media/{{ announcement.house.photo_set.first.src }}" alt="Card image cap">
+                {% else %}
+                    <img class="card-img-top" src="/media/images/no_image_found.jpg" alt="Card image cap">
+                {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{ announcement.title }} {% if announcement.auction_completed %}<span class="badge badge-danger">Sold</span>{% endif %}</h5>
+                <p class="card-text">{{ announcement.house.description|slice:80 }}...</p>
+                <a href="/announcements/{{ announcement.id }}/">Go</a>
+              </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No property is available right now.</p>
+    {% endif %}
+{% endblock %}

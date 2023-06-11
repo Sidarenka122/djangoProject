@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block main %}
+    <a href="/announcements">< Back to list view</a>
+    <h1 class="mt-4">Lot - {{ announcement.title }}  {% if announcement.auction_completed %}<span class="badge badge-danger">Sold</span>{% endif %}</h1>
+    <p>{{ announcement.house.description }}</p>
+    <div
+        id="carouselExample"
+        class="carousel slide carousel-fade"
+        data-mdb-ride="carousel"
+    >
+        {% if announcement.house.photo_set.count > 1 %}
+            <div class="carousel-indicators">
+                {% for image in announcement.house.photo_set.all %}
+                    {{ active_slide }}
+                    <button
+                      type="button"
+                      data-mdb-target="#carouselVideoExample"
+                      data-mdb-slide-to="{{ forloop.counter0 }}"
+                      class="{% if forloop.counter0 == 0 %} active{% endif %}"
+                      aria-current="true"
+                      onclick="on_next_click({{forloop.counter0}})"
+                      aria-label="Slide 1"
+                    ></button>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="carousel-inner">
+            {% for image in announcement.house.photo_set.all %}
+                <div class="carousel-item{% if forloop.counter0 == 0 %} active{% endif %}">
+                    <img src="/media/{{ image.src }}" alt="" class="img-fluid" />
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% if error_message %}
+        <div class="alert alert-danger mt-4" role="alert">
+            <strong>{{ error_message }}</strong>
+        </div>
+    {% endif %}
+    <hr />
+    <p>Previous bet - {{ announcement.max_bet }} $</p>
+    {% if announcement.sold_to %}
+        <p>Sold to - {{ announcement.sold_to }}</p>
+    {% endif %}
+    {% if user.is_authenticated and not announcement.sold_to %}
+        <form action="bet/" method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <input type="number" class="form-control" placeholder="Your bet" name="bet" id="bet"/>
+                <div class="input-group-append">
+                    <input class="btn btn-success" type="submit" value="Make a bet"/>
+                </div>
+            </div>
+        </form>
+        <hr>
+    {% endif %}
+{% endblock %}
+
+{% block chat %}
+<div class="card mt-5 mb-5">
+    <div class="card-body">
+        <h4>Chat</h4>
+        {% if user.is_authenticated %}
+            <form action="post/" method="post">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Your message" name="message"/>
+                    <div class="input-group-append">
+                        <input class="btn btn-success" type="submit" value="Send"/>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+        <div id="history">
+            {% for message in latest_messages %}
+                <div class="card">
+                    <div class="card-body">
+                        <strong>
+                            {{ message.author.username }}
+                        </strong>
+                        <br/>
+                        <em>
+                            {{ message.pub_date|date:'Y-m-d H:i:s' }}
+                        </em>
+                        <br/>
+                        {{ message.message }}
+                    </div>
+                </div>
+                <br/>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script>
+        function send_msg_update_request(){
+            $.get("msg_list", {}, parse_msg_update_response);
+        }
+
+        function parse_msg_update_response(data){
+            let res = JSON.parse(data);
+            let res_str = "";
+
+            for (let i = 0; i < res.length; i++) {
+                res_str += '<div class="card">\n' + '<div class="card-body">\n' + '<strong>\n' + res[i].author__username + '\n' + '</strong>\n' + '<br/>\n' + '<em>\n' + res[i].pub_date + '\n' + '</em>\n' + '<br/>\n' + res[i].message + '\n' + '</div>\n' + '</div>\n' + '<br/>'}
+            $("#history").html(res_str);
+        }
+
+        send_msg_update_request()
+        setInterval(send_msg_update_request, 5000);
+
+        function reset_active(selector, index) {
+            debugger;
+            const items = $(selector);
+            items.each(function() {
+              $( this ).removeClass( "active" );
+            });
+            $(`${selector}:eq(${index})`).addClass("active");
+            debugger;
+        }
+        function on_next_click(slide) {
+            reset_active(".carousel-item", slide);
+            reset_active(".carousel-indicators button", slide);
+        }
+    </script>
+{% endblock %}

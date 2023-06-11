@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Material Design Bootstrap -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.4.1/css/mdb.min.css" rel="stylesheet">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome-animation/0.0.10/font-awesome-animation.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="shortcut icon" href="https://mdbootstrap.com/wp-content/themes/mdbootstrap4/favicon.ico">        <title>Make your bets</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <a href="/announcements"><img src="/media/images/logo.png"/></a>
+                    {% if user.is_authenticated %}
+                        <p class="text-right">
+                            Hello, {{ user.username }}!
+                            <a href="/announcements/logout">Log out</a> |
+                            <a href="/announcements/password-change">
+                                Change password
+                            </a>
+                        </p>
+                    {% else %}
+                        <p class="text-right">
+                            <a href="/announcements/login">Log in</a> |
+                            <a href="/announcements/register">Register</a>
+                        </p>
+                    {% endif %}
+                    <hr class="mt-0 mb-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            {% block main %}
+
+                            {% endblock %}
+                        </div>
+                    </div>
+                    {% block chat %}
+
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
